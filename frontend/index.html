@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ARIA — Autonomous Routine Intelligence Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg-primary:#060a13;
+  --bg-secondary:#0c1220;
+  --bg-card:#111827;
+  --bg-hover:#1a2332;
+  --border:#1e293b;
+  --border-active:#3b82f6;
+  --text-primary:#f1f5f9;
+  --text-secondary:#94a3b8;
+  --text-muted:#64748b;
+  --accent:#3b82f6;
+  --accent-glow:rgba(59,130,246,0.15);
+  --accent-2:#8b5cf6;
+  --success:#10b981;
+  --warning:#f59e0b;
+  --danger:#ef4444;
+  --gradient:linear-gradient(135deg,#3b82f6,#8b5cf6);
+  --font:'Inter',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --radius:12px;
+  --radius-sm:8px;
+  --radius-lg:16px;
+  --shadow:0 4px 24px rgba(0,0,0,0.3);
+  --shadow-lg:0 8px 40px rgba(0,0,0,0.4);
+}
+body{font-family:var(--font);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
+::selection{background:var(--accent);color:#fff}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
+
+/* ── Header ── */
+header{
+  background:var(--bg-secondary);
+  border-bottom:1px solid var(--border);
+  padding:16px 32px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{
+  width:40px;height:40px;
+  background:var(--gradient);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+  box-shadow:0 0 20px rgba(59,130,246,0.3);
+}
+.logo h1{font-size:1.25rem;font-weight:700;letter-spacing:-0.02em}
+.logo h1 span{background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-sub{font-size:.7rem;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;font-weight:500}
+.header-right{display:flex;align-items:center;gap:16px}
+.status-badge{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 12px;border-radius:20px;
+  background:rgba(16,185,129,0.1);
+  border:1px solid rgba(16,185,129,0.2);
+  font-size:.75rem;color:var(--success);font-weight:500;
+}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--success);animation:pulse-dot 2s ease infinite}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
+.tech-stack{font-size:.65rem;color:var(--text-muted);font-family:var(--mono);display:none}
+@media(min-width:768px){.tech-stack{display:block}}
+
+/* ── Layout ── */
+.container{display:flex;flex:1;max-width:1400px;margin:0 auto;gap:20px;padding:20px;width:100%}
+@media(max-width:1024px){.container{flex-direction:column}}
+
+/* ── Chat Panel ── */
+.chat-panel{
+  flex:2.2;display:flex;flex-direction:column;
+  background:var(--bg-secondary);
+  border-radius:var(--radius-lg);
+  border:1px solid var(--border);
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  min-height:0;
+}
+.chat-header{
+  padding:14px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.chat-header-left{display:flex;align-items:center;gap:10px}
+.chat-header h2{font-size:.9rem;font-weight:600}
+.chat-header .agent-indicator{
+  font-size:.65rem;padding:3px 8px;border-radius:4px;
+  background:var(--accent-glow);color:var(--accent);
+  font-family:var(--mono);font-weight:500;
+}
+.chat-header-actions{display:flex;gap:6px}
+.icon-btn{
+  width:32px;height:32px;border-radius:var(--radius-sm);
+  border:1px solid var(--border);background:transparent;
+  color:var(--text-muted);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;transition:all .2s;
+}
+.icon-btn:hover{background:var(--bg-hover);color:var(--text-primary);border-color:var(--border-active)}
+
+/* ── Quick Actions ── */
+.quick-actions{
+  padding:10px 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;flex-wrap:wrap;gap:6px;
+  background:var(--bg-primary);
+}
+.qa-btn{
+  font-size:.72rem;padding:6px 14px;
+  border-radius:20px;border:1px solid var(--border);
+  background:var(--bg-secondary);color:var(--text-secondary);
+  cursor:pointer;transition:all .2s;
+  font-family:var(--font);font-weight:500;
+  display:flex;align-items:center;gap:5px;
+  white-space:nowrap;
+}
+.qa-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-glow);transform:translateY(-1px)}
+.qa-btn .emoji{font-size:.8rem}
+
+/* ── Messages ── */
+.messages{
+  flex:1;padding:20px;overflow-y:auto;
+  min-height:300px;max-height:65vh;
+  display:flex;flex-direction:column;gap:12px;
+  scroll-behavior:smooth;
+}
+.msg{
+  max-width:82%;padding:12px 16px;
+  border-radius:var(--radius);
+  line-height:1.6;font-size:.9rem;
+  white-space:pre-wrap;word-wrap:break-word;
+  animation:msg-in .3s ease;
+}
+@keyframes msg-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{
+  align-self:flex-end;
+  background:var(--accent);color:#fff;
+  border-bottom-right-radius:4px;
+}
+.msg.assistant{
+  align-self:flex-start;
+  background:var(--bg-card);color:var(--text-primary);
+  border:1px solid var(--border);
+  border-bottom-left-radius:4px;
+}
+.msg.system{
+  align-self:center;
+  background:transparent;
+  color:var(--text-muted);
+  font-size:.8rem;
+  max-width:100%;
+  text-align:center;
+  padding:8px 16px;
+}
+.msg .msg-meta{
+  font-size:.65rem;color:var(--text-muted);
+  margin-top:6px;display:flex;align-items:center;gap:6px;
+}
+.msg.assistant .msg-meta{color:var(--text-muted)}
+.msg.user .msg-meta{color:rgba(255,255,255,0.6)}
+.welcome-card{
+  text-align:center;padding:40px 20px;
+}
+.welcome-card .welcome-icon{font-size:2.5rem;margin-bottom:12px}
+.welcome-card h3{font-size:1.1rem;font-weight:600;margin-bottom:6px;color:var(--text-primary)}
+.welcome-card p{font-size:.85rem;color:var(--text-muted);line-height:1.5}
+.welcome-card .capabilities{
+  display:flex;gap:12px;justify-content:center;margin-top:20px;flex-wrap:wrap;
+}
+.welcome-card .cap{
+  padding:8px 16px;border-radius:var(--radius-sm);
+  background:var(--bg-card);border:1px solid var(--border);
+  font-size:.75rem;color:var(--text-secondary);
+  display:flex;align-items:center;gap:6px;
+}
+
+/* ── Input ── */
+.input-area{
+  padding:16px 20px;
+  border-top:1px solid var(--border);
+  background:var(--bg-primary);
+}
+.input-row{
+  display:flex;gap:10px;
+  background:var(--bg-secondary);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:4px 4px 4px 16px;
+  transition:border-color .2s;
+}
+.input-row:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.input-row input{
+  flex:1;padding:10px 0;
+  border:none;background:transparent;
+  color:var(--text-primary);font-size:.9rem;
+  font-family:var(--font);outline:none;
+}
+.input-row input::placeholder{color:var(--text-muted)}
+.send-btn{
+  padding:10px 20px;border-radius:var(--radius-sm);
+  border:none;background:var(--gradient);
+  color:#fff;font-weight:600;font-size:.85rem;
+  cursor:pointer;transition:all .2s;
+  font-family:var(--font);
+  display:flex;align-items:center;gap:6px;
+}
+.send-btn:hover{opacity:.9;transform:scale(1.02)}
+.send-btn:disabled{opacity:.4;cursor:wait;transform:none}
+.send-btn svg{width:16px;height:16px}
+
+/* ── Side Panel ── */
+.side-panel{
+  flex:1;display:flex;flex-direction:column;gap:16px;
+  min-width:280px;max-width:380px;
+}
+@media(max-width:1024px){.side-panel{max-width:100%;flex-direction:row;flex-wrap:wrap}
+  .side-panel .card{flex:1;min-width:250px}}
+
+.card{
+  background:var(--bg-secondary);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  transition:border-color .2s;
+}
+.card:hover{border-color:rgba(59,130,246,0.2)}
+.card-header{
+  padding:12px 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg-primary);
+}
+.card-header-left{display:flex;align-items:center;gap:8px}
+.card-header .card-icon{
+  width:28px;height:28px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;
+}
+.card-header h3{font-size:.8rem;font-weight:600;color:var(--text-primary)}
+.card-count{
+  font-size:.65rem;padding:2px 7px;border-radius:10px;
+  background:var(--bg-card);color:var(--text-muted);
+  font-family:var(--mono);font-weight:500;
+  border:1px solid var(--border);
+}
+.card-refresh{
+  width:26px;height:26px;border-radius:6px;
+  border:1px solid var(--border);background:transparent;
+  color:var(--text-muted);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;transition:all .2s;
+}
+.card-refresh:hover{background:var(--bg-hover);color:var(--text-primary);transform:rotate(90deg)}
+.card-body{padding:0;max-height:220px;overflow-y:auto}
+.card-item{
+  padding:10px 16px;
+  border-bottom:1px solid rgba(30,41,59,0.5);
+  transition:background .15s;
+  cursor:default;
+}
+.card-item:last-child{border-bottom:none}
+.card-item:hover{background:var(--bg-hover)}
+.card-item-title{font-size:.82rem;font-weight:500;color:var(--text-primary);margin-bottom:2px}
+.card-item-sub{font-size:.7rem;color:var(--text-muted);display:flex;align-items:center;gap:6px}
+.card-item-sub .badge{
+  padding:1px 6px;border-radius:4px;font-size:.6rem;font-weight:600;text-transform:uppercase;
+}
+.badge-pending{background:rgba(245,158,11,0.15);color:var(--warning)}
+.badge-completed{background:rgba(16,185,129,0.15);color:var(--success)}
+.badge-in_progress{background:rgba(59,130,246,0.15);color:var(--accent)}
+.badge-high{background:rgba(239,68,68,0.15);color:var(--danger)}
+.badge-medium{background:rgba(245,158,11,0.15);color:var(--warning)}
+.badge-low{background:rgba(16,185,129,0.15);color:var(--success)}
+.empty-state{
+  padding:24px 16px;text-align:center;
+  color:var(--text-muted);font-size:.8rem;
+}
+.empty-state .empty-icon{font-size:1.5rem;margin-bottom:8px;opacity:.5}
+.empty-state p{line-height:1.4}
+
+/* Tasks icon */
+.icon-tasks{background:rgba(59,130,246,0.1);color:var(--accent)}
+.icon-events{background:rgba(139,92,246,0.1);color:var(--accent-2)}
+.icon-notes{background:rgba(16,185,129,0.1);color:var(--success)}
+
+/* ── Typing indicator ── */
+.typing{display:flex;gap:4px;padding:12px 16px;align-self:flex-start}
+.typing span{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--text-muted);
+  animation:bounce .6s ease infinite;
+}
+.typing span:nth-child(2){animation-delay:.1s}
+.typing span:nth-child(3){animation-delay:.2s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* ── Footer ── */
+footer{
+  padding:12px 32px;
+  text-align:center;
+  font-size:.65rem;
+  color:var(--text-muted);
+  border-top:1px solid var(--border);
+  background:var(--bg-secondary);
+  font-family:var(--mono);
+}
+footer a{color:var(--accent);text-decoration:none}
+footer a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+
+<!-- ═══ Header ═══ -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🧠</div>
+    <div>
+      <h1><span>ARIA</span></h1>
+      <div class="logo-sub">Autonomous Routine Intelligence Assistant</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="tech-stack">ADK • MCP • Gemini • Firestore</span>
+    <div class="status-badge"><span class="status-dot"></span> Online</div>
+  </div>
+</header>
+
+<!-- ═══ Main ═══ -->
+<div class="container">
+
+  <!-- Chat Panel -->
+  <div class="chat-panel">
+    <div class="chat-header">
+      <div class="chat-header-left">
+        <h2>Chat</h2>
+        <span class="agent-indicator">primary_agent</span>
+      </div>
+      <div class="chat-header-actions">
+        <button class="icon-btn" onclick="clearChat()" title="Clear chat">🗑</button>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <button class="qa-btn" onclick="sq('Create a high priority task to prepare the quarterly report')"><span class="emoji">📋</span> New Task</button>
+      <button class="qa-btn" onclick="sq('Schedule a team meeting for 2026-04-10 at 14:00')"><span class="emoji">📅</span> Schedule Event</button>
+      <button class="qa-btn" onclick="sq('Save a note titled Project Ideas with content: Explore AI agent architectures. Tags: project,ideas')"><span class="emoji">📝</span> Save Note</button>
+      <button class="qa-btn" onclick="sq('Show me all my tasks')"><span class="emoji">📊</span> List Tasks</button>
+      <button class="qa-btn" onclick="sq('What is on my schedule?')"><span class="emoji">🗓️</span> My Schedule</button>
+      <button class="qa-btn" onclick="sq('Schedule a meeting for tomorrow at 10:00, create a task to prepare slides, and save meeting agenda notes')"><span class="emoji">⚡</span> Multi-Step</button>
+    </div>
+
+    <div class="messages" id="ms">
+      <div class="welcome-card">
+        <div class="welcome-icon">🧠</div>
+        <h3>Welcome to ARIA</h3>
+        <p>Your Autonomous Routine Intelligence Assistant.<br>I manage tasks, calendar events, and notes — all powered by AI.</p>
+        <div class="capabilities">
+          <div class="cap"><span>📋</span> Task Management</div>
+          <div class="cap"><span>📅</span> Calendar Scheduling</div>
+          <div class="cap"><span>📝</span> Smart Notes</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-row">
+        <input id="ci" placeholder="Ask ARIA anything..." onkeydown="if(event.key==='Enter'&&!event.shiftKey)sd()">
+        <button class="send-btn" id="sb" onclick="sd()">
+          Send
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Side Panel -->
+  <div class="side-panel">
+
+    <!-- Tasks Card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-icon icon-tasks">📋</div>
+          <h3>Tasks</h3>
+          <span class="card-count" id="tc">0</span>
+        </div>
+        <button class="card-refresh" onclick="rt()" title="Refresh">↻</button>
+      </div>
+      <div class="card-body" id="tl">
+        <div class="empty-state"><div class="empty-icon">📋</div><p>No tasks yet.<br>Ask ARIA to create one!</p></div>
+      </div>
+    </div>
+
+    <!-- Events Card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-icon icon-events">📅</div>
+          <h3>Events</h3>
+          <span class="card-count" id="ec">0</span>
+        </div>
+        <button class="card-refresh" onclick="re()" title="Refresh">↻</button>
+      </div>
+      <div class="card-body" id="el">
+        <div class="empty-state"><div class="empty-icon">📅</div><p>No events yet.<br>Ask ARIA to schedule one!</p></div>
+      </div>
+    </div>
+
+    <!-- Notes Card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-left">
+          <div class="card-icon icon-notes">📝</div>
+          <h3>Notes</h3>
+          <span class="card-count" id="nc">0</span>
+        </div>
+        <button class="card-refresh" onclick="rn()" title="Refresh">↻</button>
+      </div>
+      <div class="card-body" id="nl">
+        <div class="empty-state"><div class="empty-icon">📝</div><p>No notes yet.<br>Ask ARIA to save one!</p></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ Footer ═══ -->
+<footer>
+  ARIA v1.0 — Built with Google ADK + MCP + Gemini 2.5 Flash + Cloud Firestore + Cloud Run
+</footer>
+
+<!-- ═══ Script ═══ -->
+<script>
+let sid='';
+const ms=document.getElementById('ms');
+
+function time(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+
+function addMsg(text,type){
+  // Remove welcome card if present
+  const wc=ms.querySelector('.welcome-card');
+  if(wc)wc.remove();
+  const d=document.createElement('div');
+  d.className='msg '+type;
+  const content=document.createElement('div');
+  content.textContent=text;
+  d.appendChild(content);
+  if(type!=='system'){
+    const meta=document.createElement('div');
+    meta.className='msg-meta';
+    meta.textContent=(type==='user'?'You':'ARIA')+' • '+time();
+    d.appendChild(meta);
+  }
+  ms.appendChild(d);
+  ms.scrollTop=ms.scrollHeight;
+  return d;
+}
+
+function addTyping(){
+  const d=document.createElement('div');
+  d.className='typing';d.id='typing';
+  d.innerHTML='<span></span><span></span><span></span>';
+  ms.appendChild(d);
+  ms.scrollTop=ms.scrollHeight;
+  return d;
+}
+function removeTyping(){const t=document.getElementById('typing');if(t)t.remove()}
+
+async function sd(){
+  const i=document.getElementById('ci'),t=i.value.trim();
+  if(!t)return;
+  i.value='';
+  addMsg(t,'user');
+  const b=document.getElementById('sb');
+  b.disabled=true;b.innerHTML='Thinking...';
+  addTyping();
+  try{
+    const r=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t,session_id:sid})});
+    removeTyping();
+    if(!r.ok){const e=await r.json();addMsg('Error: '+(e.detail||'Unknown error'),'system');return}
+    const d=await r.json();
+    sid=d.session_id;
+    addMsg(d.response,'assistant');
+    setTimeout(()=>{rt();re();rn()},500);
+  }catch(e){
+    removeTyping();
+    addMsg('Network error: '+e.message,'system');
+  }finally{
+    b.disabled=false;
+    b.innerHTML='Send <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>';
+  }
+}
+
+function sq(t){document.getElementById('ci').value=t;sd()}
+
+function clearChat(){
+  sid='';
+  ms.innerHTML=`<div class="welcome-card">
+    <div class="welcome-icon">🧠</div>
+    <h3>Welcome to ARIA</h3>
+    <p>Your Autonomous Routine Intelligence Assistant.<br>I manage tasks, calendar events, and notes — all powered by AI.</p>
+    <div class="capabilities">
+      <div class="cap"><span>📋</span> Task Management</div>
+      <div class="cap"><span>📅</span> Calendar Scheduling</div>
+      <div class="cap"><span>📝</span> Smart Notes</div>
+    </div>
+  </div>`;
+}
+
+async function rt(){
+  try{
+    const r=await fetch('/tasks'),d=await r.json(),l=document.getElementById('tl'),c=document.getElementById('tc');
+    if(!d.tasks||!d.tasks.length){c.textContent='0';l.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>No tasks yet.<br>Ask ARIA to create one!</p></div>';return}
+    c.textContent=d.tasks.length;
+    l.innerHTML=d.tasks.map(t=>`<div class="card-item">
+      <div class="card-item-title">${esc(t.title)}</div>
+      <div class="card-item-sub">
+        <span class="badge badge-${t.status||'pending'}">${t.status||'pending'}</span>
+        <span class="badge badge-${t.priority||'medium'}">${t.priority||'medium'}</span>
+        ${t.description?'<span>'+esc(t.description).substring(0,30)+'</span>':''}
+      </div>
+    </div>`).join('');
+  }catch(e){}
+}
+
+async function re(){
+  try{
+    const r=await fetch('/schedule'),d=await r.json(),l=document.getElementById('el'),c=document.getElementById('ec');
+    if(!d.events||!d.events.length){c.textContent='0';l.innerHTML='<div class="empty-state"><div class="empty-icon">📅</div><p>No events yet.<br>Ask ARIA to schedule one!</p></div>';return}
+    c.textContent=d.events.length;
+    l.innerHTML=d.events.map(e=>`<div class="card-item">
+      <div class="card-item-title">${esc(e.title)}</div>
+      <div class="card-item-sub">
+        <span>📆 ${e.date}</span>
+        <span>🕐 ${e.time}</span>
+      </div>
+    </div>`).join('');
+  }catch(e){}
+}
+
+async function rn(){
+  try{
+    const r=await fetch('/notes'),d=await r.json(),l=document.getElementById('nl'),c=document.getElementById('nc');
+    if(!d.notes||!d.notes.length){c.textContent='0';l.innerHTML='<div class="empty-state"><div class="empty-icon">📝</div><p>No notes yet.<br>Ask ARIA to save one!</p></div>';return}
+    c.textContent=d.notes.length;
+    l.innerHTML=d.notes.map(n=>`<div class="card-item">
+      <div class="card-item-title">${esc(n.title)}</div>
+      <div class="card-item-sub">
+        ${(n.tags||[]).map(t=>'<span class="badge badge-low">'+esc(t)+'</span>').join('')}
+      </div>
+    </div>`).join('');
+  }catch(e){}
+}
+
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+// Initial load
+rt();re();rn();
+</script>
+</body>
+</html>
